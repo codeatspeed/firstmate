@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "read_config_from": {
+    "claude": false
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -lc 'root=${DEVIN_PROJECT_DIR:-}; if [ -z \"$root\" ]; then root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0; fi; [ -f \"$root/.devin/config.json\" ] && [ -x \"$root/bin/fm-sessionstart-nudge.sh\" ] || exit 0; nudge=$(\"$root/bin/fm-sessionstart-nudge.sh\") || exit 0; [ -n \"$nudge\" ] || exit 0; node -e \"process.stdout.write(JSON.stringify({add_context: process.argv[1]}))\" \"$nudge\"'"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "exec",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -lc 'root=${DEVIN_PROJECT_DIR:-}; if [ -z \"$root\" ]; then root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0; fi; [ -f \"$root/.devin/config.json\" ] && [ -x \"$root/bin/fm-arm-pretool-check.sh\" ] || exit 0; exec \"$root/bin/fm-arm-pretool-check.sh\" --claude'"
+          },
+          {
+            "type": "command",
+            "command": "bash -lc 'root=${DEVIN_PROJECT_DIR:-}; if [ -z \"$root\" ]; then root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0; fi; [ -f \"$root/.devin/config.json\" ] && [ -x \"$root/bin/fm-cd-pretool-check.sh\" ] || exit 0; exec \"$root/bin/fm-cd-pretool-check.sh\" --claude'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -lc 'root=${DEVIN_PROJECT_DIR:-}; if [ -z \"$root\" ]; then root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0; fi; [ -f \"$root/.devin/config.json\" ] && [ -x \"$root/bin/fm-turnend-guard.sh\" ] || exit 0; exec \"$root/bin/fm-turnend-guard.sh\"'"
+          }
+        ]
+      }
+    ]
+  }
+}
